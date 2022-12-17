@@ -62,13 +62,23 @@ def get_posts():
 #     # "new_posts": f"title {payload['title']} content: {payload['content']}"}
 #     return {"data": "new post"}
 
+# @app.post("/posts", status_code=status.HTTP_201_CREATED)
+# def create_posts(post: Post):
+#     post_dict = post.dict()
+#     post_dict["id"] = len(my_posts)+1
+#     my_posts.append(post_dict)
+#     return {"data": post_dict}
+#     # title str, content str
+
+
 @app.post("/posts", status_code=status.HTTP_201_CREATED)
 def create_posts(post: Post):
-    post_dict = post.dict()
-    post_dict["id"] = len(my_posts)+1
-    my_posts.append(post_dict)
-    return {"data": post_dict}
-    # title str, content str
+    cursor.execute("""INSERT INTO post (title, content, published) VALUES (%s, %s, %s) RETURNING *""",
+                   (post.title, post.content, post.published))
+    new_post = cursor.fetchone()
+    conn.commit()
+
+    return {"data": new_post}
 
 
 @app.post("/save-data")
