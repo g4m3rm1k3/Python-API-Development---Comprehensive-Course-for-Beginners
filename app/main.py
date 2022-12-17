@@ -99,16 +99,35 @@ def load_data():
     return data
 
 
+# @app.get("/posts/{id}")
+# def get_posts(id: int, response: Response):
+#     post = find_post(id)
+#     if not post:
+#         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+#                             detail=f"post with id: {id} not found")
+#         # response.status_code = status.HTTP_404_NOT_FOUND
+#         # return {"message": f"post with id: {id} was not found"}
+#     return {"post_detail": post}
+
+
 @app.get("/posts/{id}")
 def get_posts(id: int, response: Response):
-    post = find_post(id)
+    cursor.execute("""SELECT * FROM post WHERE id = %s""", str(id))
+    post = cursor.fetchone()
     if not post:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                             detail=f"post with id: {id} not found")
-        # response.status_code = status.HTTP_404_NOT_FOUND
-        # return {"message": f"post with id: {id} was not found"}
+
     return {"post_detail": post}
 
+
+# @app.delete("/posts/{id}", status_code=status.HTTP_204_NO_CONTENT)
+# def delete_post(id: int):
+#     # deleting posts
+#     global my_posts
+#     # [d for d in my_posts if d['id'] != id]
+#     my_posts = list(filter(lambda x: (x['id'] != id), my_posts))
+#     print(my_posts)
 
 @app.delete("/posts/{id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_post(id: int):
