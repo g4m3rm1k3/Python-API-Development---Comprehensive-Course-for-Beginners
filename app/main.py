@@ -51,7 +51,6 @@ async def root():
 def get_posts():
     cursor.execute(""" SELECT * FROM post""")
     posts = cursor.fetchall()
-    print(posts)
     return {"data": posts}
 
 
