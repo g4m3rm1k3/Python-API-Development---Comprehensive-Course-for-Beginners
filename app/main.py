@@ -131,11 +131,7 @@ def get_posts(id: int, response: Response):
 
 @app.delete("/posts/{id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_post(id: int):
-    # deleting posts
-    global my_posts
-    # [d for d in my_posts if d['id'] != id]
-    my_posts = list(filter(lambda x: (x['id'] != id), my_posts))
-    print(my_posts)
+    cursor.execute("""DELETE from post WHERE id = %s RETURNING * """, str(id))
 
 
 @app.put("/posts/{id}")
