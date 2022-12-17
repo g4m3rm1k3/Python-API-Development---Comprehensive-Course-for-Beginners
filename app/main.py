@@ -132,14 +132,28 @@ def get_posts(id: int, response: Response):
 @app.delete("/posts/{id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_post(id: int):
     cursor.execute("""DELETE from post WHERE id = %s RETURNING * """, str(id))
+    conn.commit()
+
+
+# @app.put("/posts/{id}")
+# def update_post(id: int, post: Post):
+#     print(post)
+#     global my_posts
+#     post_dict = post.dict()
+#     my_posts = list(filter(lambda x: (x['id'] != id), my_posts))
+#     post_dict['id'] = id
+#     my_posts.append(post_dict)
+#     return {"message": post_dict}
 
 
 @app.put("/posts/{id}")
 def update_post(id: int, post: Post):
-    print(post)
-    global my_posts
-    post_dict = post.dict()
-    my_posts = list(filter(lambda x: (x['id'] != id), my_posts))
-    post_dict['id'] = id
-    my_posts.append(post_dict)
-    return {"message": post_dict}
+    cursor.execute(""" UPDATE post SET title = %s, content = %s, publisheD = %s WHERE id = %s RETURNING *""",
+                   (post.title, post.content, post.published, str(id)))
+    updated_post = cursor.fetchone()
+    if updated_post == None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+                            detail=f"post with id : {id} does not exits")
+    else:
+        conn.commit()
+    return {"message": updated_post}
